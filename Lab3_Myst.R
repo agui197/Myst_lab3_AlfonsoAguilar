@@ -187,12 +187,13 @@ trading_PMP <- function(Historico,v,pond,pI,pO,cap){
       }
     }
   }
-  result<-Historico$R_Cuenta[900]
+  result<-Historico
+  #result<-Historico$R_Cuenta[900]
   return(result)
 }
 ######################
-
-
+#respuesta<-list()
+respuesta<-trading_PMP(Historico,v,pond,pI,pO,cap)
 
 ######################
 # Datos inciales
