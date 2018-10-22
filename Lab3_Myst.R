@@ -1,7 +1,7 @@
 # -- Borrar todos los elementos del environment
 rm(list=ls())
 mdir <- getwd()
-
+(library(tictoc))
 # -- Establecer el sistema de medicion de la computadora
 Sys.setlocale(category = "LC_ALL", locale = "")
 
@@ -193,11 +193,11 @@ trading_PMP <- function(Historico,v,pond,pI,pO,cap){
 
 
 
-
+######################
+# Datos inciales
 pI=.2
 pO=.15
 cap=1000000
-
 #Creacion del data frame
 Historico   <- c()
 Historico <- data.frame("Date" = row.names(Precios_Oanda),
@@ -209,11 +209,84 @@ Historico <- data.frame("Date" = row.names(Precios_Oanda),
                         "Titulos_a" = 0,
                         "Operacion" = NA, "Comisiones" = 0,"Comisiones_a" = 0, "Mensaje" = NA)
 result<-c()
-for(v in 1:30){
+for(v in 1:21){
   pondt <- runif(v, min=0, max=1)
   pond <- pondt/sum(pondt)
   result[v]<-trading_PMP(Historico,v,pond,pI,pO,cap)
 }
+
+
+###################
+
+tic()
+np<-20; #N?mero de particulas
+iterations<-20
+#inicializaci?n
+x1p<-list()
+vx1<-list()
+for(j in 1:length(seq(np))){
+  x1p[[j]]<-list()
+  vx1[[j]]<-list()
+} 
+
+for(j in 1:length(seq(np))){
+  x1p[[j]][1:v]<-pond
+  x1p[[j]][v+1]<-runif(1, min=0, max=.9)
+  x1p[[j]][v+2]<-runif(1, min=0, max=.9)
+} 
+
+x1pg<-list()
+for(j in 1:(length(v)+2)){
+  x1pg[[j]]<-0
+}
+
+
+
+for(j in 1:length(seq(np))){
+  for(l in 1:(v+2)){
+    vx1[[j]][l]<-0
+  }
+}
+x1pL<-x1p
+
+fxpg<-1000 #desempe?o valor inicial del mejor global
+fxpL<-list()
+for(j in 1:length(seq(np))){
+  fxpL[[j]]<-c(fxpg) #desempe?o delos mejores locales
+}
+c1<-0.3 #Velocidad de convergencia al  mejor global
+c2<-0.3 #velocidad de convergencia al mejor local
+#iteraciones
+for(k in 1:length(seq(iterations))){
+  fx<-list()
+  a<- -1000
+  for(i in 1:length(seq(np))){
+    suma<-list()
+    for(l in 1:v){
+      suma[[l]]<-max(-x1p[[i]][l][[1]],0)
+    }
+    t<-trading_PMP(Historico,v,array(as.numeric(unlist(x1p[[i]][1:v]))),x1p[[i]][v+1][[1]],x1p[[i]][v+2][[1]],cap)
+    fx[[i]]<- -(t+a*abs(cumsum(x1p[[1]][1:v])[v]-1)+a*cumsum(suma)[v]+a*max(-x1p[[1]][[v+1]],0)+a*max(x1p[[1]][[v+1]]-1,0)+a*max(-x1p[[1]][[v+2]],0)+a*max(x1p[[1]][[v+2]]-1,0))
+  }
+  ind<-which.min(fx)
+  val<-fx[[ind]]
+  if(val<fxpg){
+    x1pg<-x1p[[ind]]
+    fxpg<-val;
+  }
+  for(p in 1:seq((length(np)))){
+    if(fx[[p]]<fxpL[[p]]){
+      x1pL[[p]]<-x1p[[p]]
+    }
+  }
+  for(p in 1:seq(length(np))){
+    vx1[[p]]=array(as.numeric(unlist(vx1[[p]])))+c1*runif(v+2, min=0, max=1)*(array(as.numeric(unlist(x1pg)))-array(as.numeric(unlist(x1p[[p]]))))+c2*runif(v+2, min=0, max=1)*(array(as.numeric(unlist(x1pL[[p]])))-array(as.numeric(unlist(x1p[[p]]))))
+  } 
+}
+
+optime_result<-trading_PMP(Historico,v,array(as.numeric(unlist(x1pg[1:v]))),x1pg[v+1][[1]],x1pg[v+2][[1]],cap)
+
+toc()
 
 
 
