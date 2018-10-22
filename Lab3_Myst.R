@@ -23,7 +23,7 @@ instpackages <- lapply(pkg, library, character.only=TRUE)
 
 # -- Cargar archivos desde GitHub -- #
 
-RawGitHub <- "https://raw.githubusercontent.com/IFFranciscoME/"
+  RawGitHub <- "https://raw.githubusercontent.com/IFFranciscoME/"
 ROandaAPI <- paste(RawGitHub,"ROandaAPI/master/ROandaAPI.R",sep="")
 downloader::source_url(ROandaAPI,prompt=FALSE,quiet=TRUE)
 
@@ -35,6 +35,7 @@ OA_At <- "practice"
 OA_Ai <- 1742531
 # Token para llamadas a API
 OA_Ak <- "ada4a61b0d5bc0e5939365e01450b614-4121f84f01ad78942c46fc3ac777baa6" 
+#870df85bef319db8175cddfde64099d6-ecaeac19655a8a30b16a70e7e3421924
 # Hora a la que se considera "Fin del dia"
 OA_Da <- 17
 # Uso horario
@@ -219,8 +220,8 @@ for(v in 1:21){
 ###################
 
 tic()
-np<-20; #N?mero de particulas
-iterations<-20
+np<-50; #N?mero de particulas
+iterations<-100
 #inicializaci?n
 x1p<-list()
 vx1<-list()
